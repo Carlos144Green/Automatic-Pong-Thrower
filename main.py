@@ -1,33 +1,38 @@
-import RPi.GPIO as GPIO			# using Rpi.GPIO module
-from time import sleep			# import function sleep for delay
+import time
+import Jetson.GPIO as GPIO
+from adafruit_servokit import ServoKit
+import digitalio
+import board
 
-GPIO.setwarnings(False)			# enable warning from GPIO
-GPIO.setmode(GPIO.BOARD)
-
-AN1 = 33				# set pwm1 pin on MD10-hat
-DIG2 = 18				# set dir2 pin on MD10-Hat
-DIG1 = 37				# set dir1 pin on MD10-Hat
-
-GPIO.setup(AN1, GPIO.OUT)		# set pin as output
-GPIO.setup(DIG2, GPIO.OUT)		# set pin as output
-GPIO.setup(DIG1, GPIO.OUT)		# set pin as output
-sleep(1)				# delay for 1 seconds
-p1 = GPIO.PWM(AN1, 100)			# set pwm for M1
-
-GPIO.output(DIG1, GPIO.HIGH)		# set DIG1 as HIGH, M1B will turn ON
-GPIO.output(DIG2, GPIO.LOW)		# set DIG2 as HIGH, M2B will turn ON
+kit1 = ServoKit(channels=16, address=0x40, reference_clock_speed = 31000000, frequency=420)
+kit2 = ServoKit(channels=16, 	address=0x41, reference_clock_speed = 31000000)
+#GPIO.setmode(GPIO.BOARD)
+time.sleep(1)				# delay for 1 seconds
 
 
-try:					
-  while True:
-   p1.start(100)			# set speed for M1 at 100%
-   sleep(5)				#delay for 2 second
-   p1.start(30)			# set speed for M1 at 100%
-   sleep(5)				#delay for 2 second
-   p1.start(0)			# set speed for M1 at 100%
-   sleep(5)	
+PWM = 6
+kit1.servo[PWM].angle = 180
+shootMin = 0
+shootMax = 180
+shootServo = 0
+kit2.servo[shootServo].set_pulse_width_range(400, 2000)
 
-except:					# exit programe when keyboard interupt
-   p1.start(0)				# set speed to 0
 
-					# Control+x to save file and exit
+sig1 = digitalio.DigitalInOut(board.D24)
+sig2 = digitalio.DigitalInOut(board.D26)
+sig1.direction = digitalio.Direction.OUTPUT
+sig2.direction = digitalio.Direction.OUTPUT
+
+sig2.value= True
+sig1.value= False
+
+while True:
+
+	kit2.servo[shootServo].angle = shootMax
+	print("max")
+	time.sleep(2)
+
+	kit2.servo[shootServo].angle = shootMin
+
+	print("min")
+	time.sleep(2)
