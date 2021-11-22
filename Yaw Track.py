@@ -112,7 +112,7 @@ while True:
     
     
     
-    #img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)  # Resize
+    img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)  # Resize
     cv2.imshow("kk", img)
     cv2.imshow("kk2", ranges)
      
