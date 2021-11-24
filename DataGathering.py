@@ -9,16 +9,16 @@ labels = ['Plastic_Cup']
 number_imgs = 20
 
 cap = cv2.VideoCapture(0)
-for label in labels:
-    print('Collecting images for {}'.format(label))
-    for img_num in range(number_imgs):
-        input('Collecting images for {}, image number {}'.format(label, img_num))
-        ret, frame = cap.read()
-        imgname = os.path.join(IMAGES_PATH, label+'.'+str(uuid.uuid1())+'.jpg')
+ret, frame = cap.read()
+img_num = 0
+while True:
+    ret, frame = cap.read()
+    if cv2.waitKey(10) & 0xFF == ord('c'):
+        imgname = os.path.join(IMAGES_PATH, labels[0]+'.'+str(uuid.uuid1())+'.jpg')
         cv2.imwrite(imgname, frame)
-        cv2.imshow('Image Collection', frame)
-        time.sleep(2)        
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            break
+        time.sleep(1)
+    cv2.imshow('Image Collection', frame)
+    if cv2.waitKey(10) & 0xFF == ord('q'):
+        break
 cap.release()
 cv2.destroyAllWindows()
