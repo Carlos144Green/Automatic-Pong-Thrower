@@ -18,7 +18,7 @@ def interpolate(x,y,distance):
     p6 = np.polyfit(x,y,6)
 
     xp = np.linspace(0,150,1000)
-    distance = np.polyval(p3,distance)
+    distance = np.polyval(p4,distance)
     return distance
 
 def ultra_sonic():
