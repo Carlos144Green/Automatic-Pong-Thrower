@@ -1,3 +1,7 @@
+'''
+This file moves the robot in the YAW direction using HSV tracking
+-Carlos Cuartas
+'''
 import time
 import RPi.GPIO as GPIO
 from adafruit_servokit import ServoKit
@@ -19,23 +23,24 @@ def make_64p():
     cap.set(3, 240)
     cap.set(4, 64)
     
-
+#assigns servokits
 kit1 = ServoKit(channels=16, address=0x40, reference_clock_speed = 31000000, frequency=420)
 kit2 = ServoKit(channels=16, address=0x41, reference_clock_speed = 31000000)
 
 cv2.namedWindow("Slide Bar")  # Make window for trackbars
 cv2.resizeWindow("Slide Bar", 700, 500)
-cv2.createTrackbar("Hue Max", "Slide Bar", 145, 180, empty)
-cv2.createTrackbar("Hue Min", "Slide Bar", 119, 180, empty)
-cv2.createTrackbar("Sat Max", "Slide Bar", 186, 255, empty)
-cv2.createTrackbar("Sat Min", "Slide Bar", 63, 255, empty)
-cv2.createTrackbar("Val Max", "Slide Bar", 207, 255, empty)
-cv2.createTrackbar("Val Min", "Slide Bar", 44, 255, empty)
+cv2.createTrackbar("Hue Max", "Slide Bar", 190, 180, empty)
+cv2.createTrackbar("Hue Min", "Slide Bar", 0, 180, empty)
+cv2.createTrackbar("Sat Max", "Slide Bar", 255, 255, empty)
+cv2.createTrackbar("Sat Min", "Slide Bar", 144, 255, empty)
+cv2.createTrackbar("Val Max", "Slide Bar", 255, 255, empty)
+cv2.createTrackbar("Val Min", "Slide Bar", 0, 255, empty)
 cv2.createTrackbar("tweak1", "Slide Bar", 27, 100, empty)
 cv2.createTrackbar("tweak2", "Slide Bar", 40, 100, empty)
 
+
 cap = cv2.VideoCapture(0)
-make_64p()    
+make_240p()    #reduces resolution to 240 for speed
     
 _, img = cap.read()
 rows, cols, _ = img.shape
@@ -49,7 +54,7 @@ timeOut = 0
 yawServo = 2
 xposition = 90
 
-kit2.servo[yawServo].angle = 0
+kit2.servo[yawServo].angle = 0#moves servo around to test
 time.sleep(.4)
 kit2.servo[yawServo].angle = 180
 time.sleep(.6)
@@ -69,16 +74,16 @@ while True:
     th2 = cv2.getTrackbarPos("tweak2", "Slide Bar")
 
 
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)                                          # Convert to HSV
-    #ranges = cv2.inRange(hsv, np.array([hue_m, sat_m, val_m]), np.array([hue_M, sat_M, val_M]))       # Get mask for color
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)       #hsv value grab                                   # Convert to HSV
+    ranges = cv2.inRange(hsv, np.array([hue_m, sat_m, val_m]), np.array([hue_M, sat_M, val_M]))       # Get mask for color
     #ranges = cv2.inRange(hsv, np.array([0, 35, 197]), np.array([12, 255, 255]))       # Get range for balls
-    ranges = cv2.inRange(hsv, np.array([0, 157, 146]), np.array([255, 255, 255]))       # Get range for cups
-    ranges = cv2.morphologyEx(ranges, cv2.MORPH_OPEN, kernel)                           # Narc strays
+    #ranges = cv2.inRange(hsv, np.array([0, 157, 146]), np.array([255, 255, 255]))       # Get range for cups
+    ranges = cv2.morphologyEx(ranges, cv2.MORPH_OPEN, kernel)  #cleans up the stray false results                         # Narc strays
 
     contours, rank = cv2.findContours(ranges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)   # Get table edges
     contours = sorted(contours, key=lambda x: cv2.contourArea(x), reverse=True)         # Sort by area size
 
-    for cnt in contours:
+    for cnt in contours:#gets largest mass and only tracks that
         (x, y, w, h) = cv2.boundingRect(cnt)
         if cv2.contourArea(cnt)>80:
            # print("owo")
@@ -90,10 +95,10 @@ while True:
     cv2.line(img, (x_medium, 0), (x_medium, 480), (0, 255, 0), 2) # Object x line
     cv2.line(img, (xcenter-tweak, 0), (xcenter-tweak, 480), (100, 100, 100), 2) # Object x top line
     cv2.line(img, (xcenter+tweak, 0), (xcenter+tweak, 480), (100, 100, 100), 2) # Object x bot line
-    cv2.fillPoly(img,contours,(200,200,0))
+    #cv2.fillPoly(img,contours,(200,200,0))
     
     
-    if x_medium < xcenter - tweak:
+    if x_medium < xcenter - tweak: #if not alligned move
         if xposition + 1 < 180:
             xposition += 1
     elif x_medium > xcenter + tweak:
@@ -101,7 +106,7 @@ while True:
             xposition -= 1
     kit2.servo[yawServo].angle = xposition
 
-    if timeOut > 10:
+    if timeOut > 10:# resets if lost object or out of bounds
         xposition = 90
         timeOut = 0
         x_medium = int(cols / 2)            # Object's x cords
@@ -112,7 +117,7 @@ while True:
     
     
     
-    img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)  # Resize
+    img = cv2.resize(img, None, fx=2.5, fy=2.5, interpolation=cv2.INTER_CUBIC)  # Resize
     cv2.imshow("kk", img)
     cv2.imshow("kk2", ranges)
      

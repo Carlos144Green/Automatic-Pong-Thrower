@@ -1,7 +1,7 @@
-# Python program to illustrate
-# saving an operated video
-
-# organize imports
+'''
+This file was used to gather benchmark videos by rotating the robot and recording
+-Carlos Cuartas
+'''
 import numpy as np
 import cv2
 import time
