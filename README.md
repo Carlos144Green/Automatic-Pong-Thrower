@@ -11,7 +11,7 @@ This code will help reduce the dead zone of general robotic arms, while increasi
 
 https://user-images.githubusercontent.com/60107217/157759084-d5647674-f815-45a7-896e-23df09674b4f.mp4
 
-https://user-images.githubusercontent.com/60107217/157759122-aa404378-bf32-4924-a1a6-847c0f268091.mp4
+![ezgif com-gif-maker (4)](https://user-images.githubusercontent.com/60107217/157762350-f744515a-03b3-48b8-9654-f85089e1d864.gif)
 
 
 ![ezgif com-gif-maker (3)](https://user-images.githubusercontent.com/60107217/157761176-f5cdec0c-7c16-493d-817c-848229674a29.gif)
